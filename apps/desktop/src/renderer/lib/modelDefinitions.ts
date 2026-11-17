@@ -104,8 +104,8 @@ export function getModelById(modelId: string, deviceId?: string): ModelDefinitio
 }
 
 /** vendor → capabilities 缓存的 agent 键(pi 有自己的能力清单)。 */
-function agentKindForVendor(vendorKey: 'cc' | 'codex' | 'pi' | 'omp'): 'claude-code' | 'codex' | 'pi' {
-  return vendorKey === 'codex' ? 'codex' : vendorKey === 'pi' ? 'pi' : 'claude-code';
+function agentKindForVendor(vendorKey: 'cc' | 'codex' | 'pi' | 'omp'): 'claude-code' | 'codex' | 'pi' | 'omp' {
+  return vendorKey === 'codex' ? 'codex' : vendorKey === 'pi' ? 'pi' : vendorKey === 'omp' ? 'omp' : 'claude-code';
 }
 
 export function getModelsForVendor(
