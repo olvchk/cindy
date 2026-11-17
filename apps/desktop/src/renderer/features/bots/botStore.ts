@@ -41,7 +41,7 @@ export interface BotCapabilities {
   agentDeviceId?: string | null;
   effort: string;
   fastMode: boolean | 'ultrafast';
-  harness: 'claude' | 'codex' | 'pi';
+  harness: 'claude' | 'codex' | 'pi' | 'omp';
   /** Ordered, complete runtime routes. The first route is the normal choice. */
   modelChain: BotModelRoute[];
   /** null follows the global Bot default; an array is this Bot's explicit chain. */
@@ -81,7 +81,7 @@ export interface BotModelOverride {
 export type { BotHarness, BotModelRoute };
 export { BOT_MODEL_CHAIN_MAX };
 
-function vendorForHarness(harness: BotCapabilities['harness']): 'cc' | 'codex' | 'pi' {
+function vendorForHarness(harness: BotCapabilities['harness']): 'cc' | 'codex' | 'pi' | 'omp' {
   return harness === 'claude' ? 'cc' : harness;
 }
 

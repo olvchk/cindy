@@ -37,7 +37,7 @@ export function availableAppDefaultModels(input: {
   providers: readonly ProviderView[];
   currentRoute?: BotModelRoute | null;
   tuning?: (agent: 'claude-code' | 'codex' | 'pi', providerId: string, model: string) => { effort?: string; fastMode?: boolean | 'ultrafast' };
-  availableAgents: ReadonlySet<'cc' | 'codex' | 'pi'>;
+  availableAgents: ReadonlySet<'cc' | 'codex' | 'pi' | 'omp'>;
   enabled: NonNullable<Parameters<typeof resolveAvailableLocalRoute>[0]['isModelEnabled']>;
 }) {
   const current = resolveAvailableLocalRoute({ providers: input.providers, providersLoading: false,

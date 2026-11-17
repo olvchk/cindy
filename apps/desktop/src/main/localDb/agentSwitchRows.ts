@@ -9,7 +9,7 @@ import { throwIpcError } from '../utils/ipcValidate.js';
 
 /** The agent-switch row patch (applyAgentSwitchToSessionRow). */
 export type AgentSwitchRowPatch = {
-    agentKind: 'cc' | 'codex' | 'pi';
+    agentKind: 'cc' | 'codex' | 'pi' | 'omp';
     model: string;
     providerId: string | null | undefined;
     sdkSessionId?: string | null;

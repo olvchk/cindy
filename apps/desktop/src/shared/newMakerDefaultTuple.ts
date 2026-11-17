@@ -12,10 +12,10 @@ import {
   type ProviderView,
 } from '@cindy/model-providers';
 
-type MakerVendor = 'cc' | 'codex' | 'pi' | 'orca';
+type MakerVendor = 'cc' | 'codex' | 'pi' | 'omp' | 'orca';
 
 export interface NewMakerDefaultTuple {
-  vendor: Extract<MakerVendor, 'cc' | 'codex' | 'pi'>;
+  vendor: Extract<MakerVendor, 'cc' | 'codex' | 'pi' | 'omp'>;
   providerId: string;
   model: string;
   effort: Effort | null;
@@ -76,7 +76,7 @@ const DEFAULT_POLICIES: readonly ProviderDefaultPolicy[] = [
 ];
 
 function vendorForAgent(agent: AgentKind): NewMakerDefaultTuple['vendor'] {
-  return agent === 'claude-code' ? 'cc' : agent;
+  return agent === 'claude-code' ? 'cc' : agent === 'omp' ? 'omp' : agent;
 }
 
 /**

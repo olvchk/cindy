@@ -31,7 +31,7 @@ export type DeviceLinkConnectionStatus = 'connected' | 'connecting' | 'disconnec
  * 暂时只有 'cc'（Claude Code）。未来扩展 'codex' 等时新增枚举值即可，
  * schema 不动；老 session DEFAULT 'cc' 兜底。
  */
-export type AgentKind = 'cc' | 'codex' | 'pi';
+export type AgentKind = 'cc' | 'codex' | 'pi' | 'omp';
 export type MakerVendor = AgentKind | 'orca';
 export type OrcaRole = 'lead' | 'worker';
 

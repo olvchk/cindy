@@ -283,6 +283,7 @@ function makeDefault(): NewMakerDraft {
       pi: defaultVendorPrefs('pi'),
       orca: defaultVendorPrefs('orca'),
       codex: defaultVendorPrefs('codex'),
+      omp: defaultVendorPrefs('omp'),
     },
     modelChosenByVendor: {},
     defaultTupleCustomized: false,
@@ -524,6 +525,7 @@ function sanitize(raw: unknown): NewMakerDraft {
       pi: sanitizeVendorPrefs(lastByVendorRaw.pi, 'pi'),
       orca: sanitizeVendorPrefs(lastByVendorRaw.orca, 'orca'),
       codex: sanitizeVendorPrefs(lastByVendorRaw.codex, 'codex'),
+      omp: sanitizeVendorPrefs(lastByVendorRaw.omp, 'omp'),
     },
     modelChosenByVendor,
     defaultTupleCustomized,
@@ -1090,7 +1092,7 @@ export function fallbackUnavailableVendor(availableVendors: ReadonlySet<MakerVen
 }
 
 export interface SuggestedDefaultTuple {
-  vendor: Extract<MakerVendor, 'cc' | 'codex' | 'pi'>;
+  vendor: Extract<MakerVendor, 'cc' | 'codex' | 'pi' | 'omp'>;
   providerId: string;
   model: string;
   effort?: Effort | null;
