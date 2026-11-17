@@ -54,9 +54,13 @@ function toLegacy(m: ModelDescriptor, vendorKey: 'cc' | 'codex' | 'pi' | 'omp'):
 function allCachedModels(deviceId?: string): ModelDefinition[] {
   const cc = getCachedCapabilities('claude-code', deviceId);
   const codex = getCachedCapabilities('codex', deviceId);
+  const pi = getCachedCapabilities('pi', deviceId);
+  const omp = getCachedCapabilities('omp', deviceId);
   return [
     ...(cc?.availableModels ?? []).map((m) => toLegacy(m, 'cc')),
     ...(codex?.availableModels ?? []).map((m) => toLegacy(m, 'codex')),
+    ...(pi?.availableModels ?? []).map((m) => toLegacy(m, 'pi')),
+    ...(omp?.availableModels ?? []).map((m) => toLegacy(m, 'omp')),
   ];
 }
 
