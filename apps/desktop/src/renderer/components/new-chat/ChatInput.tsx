@@ -6896,11 +6896,11 @@ export function ChatInput({
             if (scoped) return scoped;
           }
         }
-        // 镜像（首帧/旧被控端兑底）只聚合 cc/codex，pi 恒查不到——再补三份被控端
-        // 能力缓存清单，避免把 pi 模型误判成空档位「固定档」。
+        // 镜像（首帧/旧被控端兑底）只聚合 cc/codex，pi 恒查不到——再补各引擎的能力
+        // 缓存清单，避免把 pi/omp 模型误判成空档位「固定档」。
         const m =
           getModelById(modelId, catalogDeviceId) ??
-          (['cc', 'codex', 'pi'] as const)
+          (['cc', 'codex', 'pi', 'omp'] as const)
             .flatMap((vendorKey) => getModelsForVendor(vendorKey, catalogDeviceId))
             .find((candidate) => candidate.id === modelId);
         return { efforts: m?.efforts ?? [], defaultEffort: m?.defaultEffort ?? null };

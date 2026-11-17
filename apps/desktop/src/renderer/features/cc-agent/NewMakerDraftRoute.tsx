@@ -1136,7 +1136,7 @@ export function NewMakerDraftRoute() {
   );
   const hiddenSwitcherVendors = useMemo<MakerVendor[]>(() => {
     if (!availableAgentsLoaded) return [];
-    return (['cc', 'codex', 'pi'] as const).filter((vendor) => !availableVendors.has(vendor));
+    return (['cc', 'codex', 'pi', 'omp'] as const).filter((vendor) => !availableVendors.has(vendor));
   }, [availableAgentsLoaded, availableVendors]);
   /**
    * 「这份草稿要建到对端设备上」—— 只看 deviceId,**不再要求 workingDir**(#807)。
