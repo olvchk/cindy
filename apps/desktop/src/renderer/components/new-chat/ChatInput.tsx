@@ -1054,17 +1054,18 @@ function rememberCatalogModelPrefs(
 }
 
 /** 统一模型选择器联合列表的候选引擎全集(与 SELECTABLE_VENDORS 同一顺序)。 */
-const UNIFIED_AGENT_KINDS: readonly AgentKind[] = ['claude-code', 'codex', 'pi'];
+const UNIFIED_AGENT_KINDS: readonly AgentKind[] = ['claude-code', 'codex', 'pi', 'omp'];
 
 /** AgentKind → NewMaker vendor(useAvailableAgents 用 vendor 口径)。 */
-function agentKindToVendor(kind: AgentKind): 'cc' | 'codex' | 'pi' {
-  return kind === 'codex' ? 'codex' : kind === 'pi' ? 'pi' : 'cc';
+function agentKindToVendor(kind: AgentKind): 'cc' | 'codex' | 'pi' | 'omp' {
+  return kind === 'codex' ? 'codex' : kind === 'pi' ? 'pi' : kind === 'omp' ? 'omp' : 'cc';
 }
 
-function vendorKeyToAgentKind(v?: 'cc' | 'codex' | 'pi'): AgentKind | null {
+function vendorKeyToAgentKind(v?: 'cc' | 'codex' | 'pi' | 'omp'): AgentKind | null {
   if (v === 'cc') return 'claude-code';
   if (v === 'codex') return 'codex';
   if (v === 'pi') return 'pi';
+  if (v === 'omp') return 'omp';
   return null;
 }
 
@@ -2013,12 +2014,15 @@ export function ChatInput({
   const ccCaps = useAgentCapabilities('claude-code', catalogDeviceId);
   const codexCaps = useAgentCapabilities('codex', catalogDeviceId);
   const piCaps = useAgentCapabilities('pi', catalogDeviceId);
+  const ompCaps = useAgentCapabilities('omp', catalogDeviceId);
   const activeAgentCapabilities =
     agentKind === 'codex'
       ? codexCaps.capabilities
       : agentKind === 'pi'
         ? piCaps.capabilities
-        : ccCaps.capabilities;
+        : agentKind === 'omp'
+          ? ompCaps.capabilities
+          : ccCaps.capabilities;
 
   // session-agent-switch 入口门控。device-link 远程会话读**被控端**的值；除了基础
   // supportsSessionAgentSwitch，还必须有 v2 CAS 能力。同引擎 no-op 的安全收尾依赖 host
