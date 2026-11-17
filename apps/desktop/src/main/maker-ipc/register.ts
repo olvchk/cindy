@@ -3393,7 +3393,7 @@ export function stopPiIdleReleaseWatcher(): void {
 }
 
 function requireAgentKind(value: unknown): AgentKind {
-  if (value === 'claude-code' || value === 'codex' || value === 'pi') return value;
+  if (value === 'claude-code' || value === 'codex' || value === 'pi' || value === 'omp') return value;
   throwIpcError('INVALID_PARAMS', 'agentKind required');
 }
 
