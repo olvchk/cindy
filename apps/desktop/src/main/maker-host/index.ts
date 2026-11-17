@@ -242,6 +242,7 @@ import {
   readNativeCodexCatalog, findCodexCatalogModel, nativeCodexFallbackModel, patchCodexModelMaxContextWindow,
 } from './codex-custom-context-catalog.js';
 import { buildPiAgent } from './pi-host.js';
+import { buildOmpAgent } from './omp-host.js';
 import {
   captureLocalPiPackageRuntimeInvalidationSnapshot,
   settleLocalPiPackageRuntimeSnapshot,
@@ -463,6 +464,7 @@ let botRuntimeResourcePreflight:
   | ((opts: MakerSessionCreateOpts) => Promise<BotProfileRuntimeSnapshot | null>)
   | null = null;
 let _registerPiAgent: (() => boolean) | null = null;
+let _registerOmpAgent: (() => boolean) | null = null;
 /** 视觉桥实例（层 A/B/C 共用），在 resetMaker 时释放缓存。 */
 let _visionBridgeInstance: ReturnType<typeof createVisionBridge> | null = null;
 
@@ -2496,6 +2498,8 @@ export function getMaker(): Maker {
     });
     const piAgent = buildPiAgentForDesktop();
     if (piAgent) makerAgents.pi = withSubscriptionAccounts(piAgent);
+    const ompAgent = buildOmpAgent({ logger: desktopMakerLogger });
+    if (ompAgent) makerAgents.omp = ompAgent;
 
     setVisionGatewayKeyReader(readClaudeApiKey);
     _visionBridgeInstance = createVisionBridge({
@@ -2954,6 +2958,21 @@ export function getMaker(): Maker {
       }
       return true;
     };
+    _registerOmpAgent = () => {
+      if (!_maker || _maker.listAvailableAgents().includes('omp')) return false;
+      const next = buildOmpAgent({ logger: desktopMakerLogger });
+      if (!next) return false;
+      const registered = _maker.registerAgent('omp', next);
+      if (!registered) {
+        void next.dispose().catch((error) => {
+          desktopMakerLogger.warn('discarding Omp agent after registration race failed', {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        });
+        return false;
+      }
+      return true;
+    };
     setVisionBridgeController({
       shouldBridge: _visionBridgeInstance.isTargetModel,
       describeImage: _visionBridgeInstance.describeImage,
@@ -3104,6 +3123,32 @@ export async function disposeRemoteCodexHostAfterRestart(hostId: string, ownerGe
   await _codexAgent?.disposeRemoteHostAfterRestart(hostId);
 }
 
+/** Register Omp after its binary becomes available and notify local renderers. */
+export function registerOmpAgentIfAvailable(): boolean {
+  const register = _registerOmpAgent;
+  if (!register) return false;
+  try {
+    if (_maker?.listAvailableAgents().includes('omp')) return true;
+    const registered = register();
+    if (!registered) return false;
+    for (const win of BrowserWindow.getAllWindows()) {
+      if (win.isDestroyed()) continue;
+      try {
+        win.webContents.send(MAKER_PUSH.AGENTS_CHANGED);
+      } catch {
+        // Window teardown may race the broadcast; other windows still receive it.
+      }
+    }
+    tapWindowBroadcast(MAKER_PUSH.AGENTS_CHANGED, {});
+    return true;
+  } catch (error) {
+    desktopMakerLogger.warn('Omp agent registration failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return false;
+  }
+}
+
 /** Register Pi after a managed runtime retry and notify local renderers. */
 export function registerPiAgentIfAvailable(): boolean {
   const register = _registerPiAgent;
@@ -3164,6 +3209,7 @@ export function resetMaker(): void {
   _maker = null;
   botRuntimeResourcePreflight = null;
   _registerPiAgent = null;
+  _registerOmpAgent = null;
   _codexAgent = null;
   _mcpProviders = {};
   // coordinator 闭包捕获了刚作废的那个 maker —— 不清掉的话,换账号窗口期内到达的 auth
