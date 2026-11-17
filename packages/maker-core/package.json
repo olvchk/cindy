@@ -34,6 +34,10 @@
     "./agents/codex": {
       "import": "./src/agents/codex/index.ts",
       "default": "./src/agents/codex/index.ts"
+    },
+    "./agents/omp": {
+      "import": "./src/agents/omp/index.ts",
+      "default": "./src/agents/omp/index.ts"
     }
   },
   "scripts": {
