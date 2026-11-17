@@ -496,6 +496,7 @@ describe('resolveRemoteModelListStatus', () => {
         cc: pending,
         codex: failed,
         pi: failed,
+        omp: ready,
         providers: { loading: false, error: null },
       }),
     ).toBe('loading');
@@ -506,6 +507,7 @@ describe('resolveRemoteModelListStatus', () => {
         cc: ready,
         codex: failed,
         pi: failed,
+        omp: ready,
         providers: { loading: false, error: null },
       }),
     ).toBe('ready');
@@ -519,6 +521,7 @@ describe('resolveRemoteModelListStatus', () => {
         cc: failed,
         codex: ready,
         pi: ready,
+        omp: ready,
         providers: { loading: false, error: null },
       }),
     ).toBe('error');
@@ -529,6 +532,7 @@ describe('resolveRemoteModelListStatus', () => {
         cc: ready,
         codex: failed,
         pi: ready,
+        omp: ready,
         providers: { loading: false, error: null },
       }),
     ).toBe('error');
@@ -539,6 +543,7 @@ describe('resolveRemoteModelListStatus', () => {
         cc: ready,
         codex: ready,
         pi: ready,
+        omp: ready,
         providers: { loading: false, error: 'timeout', unsupported: false },
       }),
     ).toBe('error');
@@ -552,6 +557,7 @@ describe('resolveRemoteModelListStatus', () => {
         cc: ready,
         codex: ready,
         pi: ready,
+        omp: ready,
         providers: { loading: false, error: 'channel not allowed', unsupported: true },
       }),
     ).toBe('ready');

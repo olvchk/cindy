@@ -206,7 +206,7 @@ export interface MakerSessionAgentSwitchHandlerDeps {
   resolveProviderGroupTarget?(
     sessionId: string,
     target: {
-      agentKind: 'claude-code' | 'codex' | 'pi';
+      agentKind: 'claude-code' | 'codex' | 'pi' | 'omp';
       model: string;
       providerId: string | null;
       /** 用户选的位置(null = 任务所在电脑)。 */
@@ -243,7 +243,7 @@ export interface MakerSessionAgentSwitchHandlerDeps {
    * (测试最小 harness)。
    */
   assertModelRouteUsable?(
-    agent: 'claude-code' | 'codex' | 'pi',
+    agent: 'claude-code' | 'codex' | 'pi' | 'omp',
     model: string,
     providerId: string | null,
     /** 被切换的任务；Agent 在另一台电脑运行的任务按那台的目录裁决(本机不校验)。 */
@@ -257,7 +257,7 @@ export interface MakerSessionAgentSwitchHandlerDeps {
    */
   assertAgentDeviceRouteUsable?(
     deviceId: string,
-    agent: 'claude-code' | 'codex' | 'pi',
+    agent: 'claude-code' | 'codex' | 'pi' | 'omp',
     model: string,
     providerId: string | null,
   ): Promise<void>;
@@ -269,7 +269,7 @@ export interface MakerSessionAgentSwitchHandlerDeps {
   readOwnerGeneration?(): number;
   confirmNativeHistoryFallback?(sessionId: string, targetDeviceId: string | null): Promise<boolean>;
   relocateNativeHistory?(input: {
-    sessionId: string; kind: 'claude-code' | 'codex' | 'pi'; nativeId: string; workingDir: string;
+    sessionId: string; kind: 'claude-code' | 'codex' | 'pi' | 'omp'; nativeId: string; workingDir: string;
     fromDevice: string | null; toDevice: string | null; assertCurrent(): void;
   }): Promise<string | null>;
   closeSession(sessionId: string): Promise<void>;
@@ -758,8 +758,13 @@ export async function performSessionAgentSwitch(
   if (typeof sessionId !== 'string' || sessionId.length === 0) {
     throwIpcError('INVALID_PARAMS', 'sessionId required');
   }
-  if (targetAgentKind !== 'claude-code' && targetAgentKind !== 'codex' && targetAgentKind !== 'pi') {
-    throwIpcError('INVALID_PARAMS', 'targetAgentKind must be claude-code | codex | pi');
+  if (
+    targetAgentKind !== 'claude-code' &&
+    targetAgentKind !== 'codex' &&
+    targetAgentKind !== 'pi' &&
+    targetAgentKind !== 'omp'
+  ) {
+    throwIpcError('INVALID_PARAMS', 'targetAgentKind must be claude-code | codex | pi | omp');
   }
   if (typeof model !== 'string' || model.length === 0) {
     throwIpcError('INVALID_PARAMS', 'model required');

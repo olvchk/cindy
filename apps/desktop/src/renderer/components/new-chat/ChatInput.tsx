@@ -2242,6 +2242,7 @@ export function ChatInput({
     cc: ccCaps,
     codex: codexCaps,
     pi: piCaps,
+    omp: ompCaps,
     providers: remoteProviders,
   });
   const providersLoading = catalogDeviceId

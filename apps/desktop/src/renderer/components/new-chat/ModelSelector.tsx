@@ -1197,10 +1197,11 @@ export interface ModelSelectorContentBaseProps {
   interactionDisabled?: boolean;
 }
 
-function vendorKeyToAgentKind(v?: 'cc' | 'codex' | 'pi'): AgentKind | null {
+function vendorKeyToAgentKind(v?: 'cc' | 'codex' | 'pi' | 'omp'): AgentKind | null {
   if (v === 'cc') return 'claude-code';
   if (v === 'codex') return 'codex';
   if (v === 'pi') return 'pi';
+  if (v === 'omp') return 'omp';
   return null;
 }
 
@@ -1228,6 +1229,7 @@ export function resolveRemoteModelListStatus({
   cc,
   codex,
   pi,
+  omp,
   providers,
 }: {
   deviceId?: string;
@@ -1235,12 +1237,18 @@ export function resolveRemoteModelListStatus({
   cc: RemoteCapabilityLoadState;
   codex: RemoteCapabilityLoadState;
   pi: RemoteCapabilityLoadState;
+  omp: RemoteCapabilityLoadState;
   providers: RemoteProviderLoadState;
 }): RemoteModelListStatus {
   if (!deviceId) return 'idle';
   const required = agentKind
-    ? [agentKind === 'claude-code' ? cc : agentKind === 'codex' ? codex : pi]
-    : [cc, codex, pi];
+    ? [
+        agentKind === 'claude-code' ? cc
+        : agentKind === 'codex' ? codex
+        : agentKind === 'pi' ? pi
+        : omp,
+      ]
+    : [cc, codex, pi, omp];
   if (required.some((state) => !!state.error)) return 'error';
   if (providers.error && !providers.unsupported) return 'error';
   if (providers.loading || required.some((state) => state.loading || state.capabilities == null)) {
@@ -1452,10 +1460,11 @@ function ModelSelectorContentView({
     // 错误地串在一起，并在回调尚未启动时留下可发送窗口。
     void agentSwitch.onSwitch(targetAgentKind, targetModelId, targetProviderId);
   };
-  // 同时拉三个 agent —— vendorKey 不传时把三边模型一起展示。hooks 必须按固定顺序调用。
+  // 同时拉四个 agent —— vendorKey 不传时把各边模型一起展示。hooks 必须按固定顺序调用。
   const cc = useAgentCapabilities('claude-code', catalogDeviceId);
   const codex = useAgentCapabilities('codex', catalogDeviceId);
   const pi = useAgentCapabilities('pi', catalogDeviceId);
+  const omp = useAgentCapabilities('omp', catalogDeviceId);
   // 本机折扣 GPT 仍按本机 API key gate；device-link 必须只看被控端 provider 状态。
   // 旧被控端不支持 provider:list 时按远端 capabilities 退化，不得误用控制端 key。
   const { hasSavedKey, canReadKey } = useApiKey();
@@ -1507,6 +1516,7 @@ function ModelSelectorContentView({
     cc,
     codex,
     pi,
+    omp,
     providers: remoteProviders,
   });
   // 分享来的供应商：分享者电脑上的 Cindy 太旧，只答得了模型目录、答不了 Agent 能力
@@ -2077,6 +2087,7 @@ function ModelSelectorContentView({
         deviceCcModels: cc.capabilities?.availableModels ?? [],
         deviceCodexModels: codex.capabilities?.availableModels ?? [],
         devicePiModels: pi.capabilities?.availableModels ?? [],
+        deviceOmpModels: omp.capabilities?.availableModels ?? [],
         excludeSubscriptionDirect,
         excludeChatBridgedCodex,
       }),
@@ -2087,6 +2098,7 @@ function ModelSelectorContentView({
       cc.capabilities,
       codex.capabilities,
       pi.capabilities,
+      omp.capabilities,
       excludeSubscriptionDirect,
       excludeChatBridgedCodex,
     ],
@@ -4516,6 +4528,7 @@ export function ModelSelector({
   const cc = useAgentCapabilities('claude-code', deviceId);
   const codex = useAgentCapabilities('codex', deviceId);
   const pi = useAgentCapabilities('pi', deviceId);
+  const omp = useAgentCapabilities('omp', deviceId);
   const gatewayPricing = useGatewayModelPricing();
   const referencePricing = useReferenceModelPricing();
   const { accountTier: modelAccessAccountTier } = useModelAccessStatus();
@@ -4545,6 +4558,7 @@ export function ModelSelector({
     cc,
     codex,
     pi,
+    omp,
     providers: remoteProviders,
   });
   const remoteModelLoading = providersOverrideState?.status === 'loading' ||
@@ -4564,6 +4578,7 @@ export function ModelSelector({
         deviceCcModels: cc.capabilities?.availableModels ?? [],
         deviceCodexModels: codex.capabilities?.availableModels ?? [],
         devicePiModels: pi.capabilities?.availableModels ?? [],
+        deviceOmpModels: omp.capabilities?.availableModels ?? [],
         excludeSubscriptionDirect,
         excludeChatBridgedCodex,
       }),
@@ -4574,6 +4589,7 @@ export function ModelSelector({
       cc.capabilities,
       codex.capabilities,
       pi.capabilities,
+      omp.capabilities,
       excludeSubscriptionDirect,
       excludeChatBridgedCodex,
     ],

@@ -238,6 +238,8 @@ export function selectVisibleModels(params: {
   deviceCcModels: ModelDescriptor[];
   deviceCodexModels: ModelDescriptor[];
   devicePiModels?: ModelDescriptor[];
+  /** omp 无 catalog 来源,清单只来自 capabilities 快照(deviceId 作用域)。 */
+  deviceOmpModels?: ModelDescriptor[];
   /**
    * SSH 远程会话(remoteHostId)传 true:订阅直连模型(chatgpt/ / xai/)不再被过滤,
    * 而是保留在清单中由调用方按 isSubscriptionDirectModel 标记禁用(置灰 + 原因提示)。
@@ -263,6 +265,7 @@ export function selectVisibleModels(params: {
     deviceCcModels,
     deviceCodexModels,
     devicePiModels = [],
+    deviceOmpModels = [],
     excludeSubscriptionDirect,
     excludeChatBridgedCodex,
   } = params;
@@ -284,6 +287,8 @@ export function selectVisibleModels(params: {
   if (agentKind === 'claude-code') return cc;
   if (agentKind === 'codex') return codex;
   if (agentKind === 'pi') return pi;
+  // omp 不在 provider catalog 里,清单只来自它的 capabilities 快照。
+  if (agentKind === 'omp') return deviceOmpModels;
   const merged = [...cc];
   const seen = new Set(merged.map((m) => m.id));
   for (const list of [codex, pi]) {
